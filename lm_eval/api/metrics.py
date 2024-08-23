@@ -392,7 +392,7 @@ def compiles_at_1_metric(predictions, references=None, **kwargs):
     for pred, ref in zip(predictions, references):
         try:
             # Extract the code snippet from the prediction
-            code_snippet = pred.strip().split("```python")[1].split("```")[0].strip()
+            code_snippet = code_snippet = pred.split("```")[0].strip()
 
             # Append the assert statements from the references to the code snippet
             code_with_asserts = code_snippet + "\n" + ref.strip()
@@ -431,8 +431,12 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
 
     for pred, ref in zip(predictions, references):
         try:
+            #import pdb; pdb.set_trace()
             # Extract the code snippet from the prediction
-            code_snippet = pred.strip().split("```python")[1].split("```")[0].strip()
+            if pred[0:3] == "```":
+                code_snippet = pred.strip().split("```python")[1].split("```")[0].strip()
+            else:
+                code_snippet = pred.split("```")[0].strip()
 
             # Extract the assert statements from the references
             assert_statements = ref.strip().split("\n")
@@ -442,12 +446,12 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
             signal.alarm(int(timeout))
 
             try:
-                # Execute the generated code
-                exec(code_snippet)
+                code_snippet_and_asserts = code_snippet + "\n" + "\n".join(assert_statements)
 
-                # Run through each assertion in the references
-                for assertion in assert_statements:
-                    exec(assertion)
+                exec_globals = {}
+
+                # Execute the generated code
+                exec(code_snippet_and_asserts, exec_globals)
 
                 # If no exception is raised, consider it a success
                 success_count += 1

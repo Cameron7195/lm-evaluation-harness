@@ -7,6 +7,7 @@ doc_to_text: |
   {{ text }}
   Your code should pass the following tests:
   {{ test_list | join('\n') }}
+doc_to_gen_prefix: "```python"
 fewshot_config:
   sampler: first_n
   samples:
@@ -14,8 +15,8 @@ fewshot_config:
     target: |
       ```python
       def similar_elements(test_tup1, test_tup2):
-          res = tuple(set(test_tup1) & set(test_tup2))
-          return (res)
+        res = tuple(set(test_tup1) & set(test_tup2))
+        return (res)
       ```
     test_list:
     - assert similar_elements((3, 4, 5, 6), (5, 7, 4, 10)) == (4, 5)
@@ -51,8 +52,6 @@ fewshot_config:
 generation_kwargs:
   do_sample: false
   until:
-  - 'Q:'
-  - '</s>'
   - '<|eot_id|>'
   - '<|start_header_id|>user<|end_header_id|>'
 tag:
@@ -70,5 +69,5 @@ metric_list:
 num_fewshot: 3
 output_type: generate_until
 repeats: 1
-task: mbpp
+task: mbpp_3shot_llama
 test_split: test

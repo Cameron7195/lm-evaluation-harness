@@ -76,6 +76,7 @@ class TaskConfig(dict):
     doc_to_text: Optional[Union[Callable, str]] = None
     doc_to_target: Optional[Union[Callable, str]] = None
     doc_to_choice: Optional[Union[Callable, str, dict, list]] = None
+    doc_to_gen_prefix: Optional[Union[Callable, str]] = None
     process_results: Optional[Union[Callable, str]] = None
     use_prompt: Optional[str] = None
     description: str = ""
@@ -1116,7 +1117,10 @@ class ConfigurableTask(Task):
                         labeled_examples, str(example), fewshot_as_multiturn
                     )
                 # return lm.apply_chat_template(labeled_examples)
-            return chat_template(labeled_examples)
+            if self.config.doc_to_gen_prefix:
+                return chat_template(labeled_examples) + self.doc_to_gen_prefix(doc)
+            else:
+                return chat_template(labeled_examples)
         else:
             if self.multiple_input:
                 return labeled_examples
@@ -1276,6 +1280,32 @@ class ConfigurableTask(Task):
             return doc_to_choice(doc)
         elif hasattr(doc_to_choice, "get_answer_choices_list"):
             return doc_to_choice.get_answer_choices_list(doc)
+        else:
+            raise TypeError
+        
+    def doc_to_gen_prefix(self, doc: Any, doc_to_gen_prefix=None) -> List[str]:
+        if self.prompt is not None:
+            doc_to_gen_prefix = self.prompt
+        elif doc_to_gen_prefix is not None:
+            doc_to_gen_prefix = doc_to_gen_prefix
+        elif self.config.doc_to_gen_prefix is None:
+            eval_logger.error("doc_to_choice was called but not set in config")
+        else:
+            doc_to_gen_prefix = self.config.doc_to_gen_prefix
+
+        if isinstance(doc_to_gen_prefix, str):
+            if doc_to_gen_prefix in self.features:
+                return doc[doc_to_gen_prefix]
+            else:
+                return utils.apply_template(doc_to_gen_prefix, doc)
+        elif isinstance(doc_to_gen_prefix, list):
+            return doc_to_gen_prefix
+        elif isinstance(doc_to_gen_prefix, dict):
+            return list(doc_to_gen_prefix.values())
+        elif callable(doc_to_gen_prefix):
+            return doc_to_gen_prefix(doc)
+        elif hasattr(doc_to_gen_prefix, "get_answer_choices_list"):
+            return doc_to_gen_prefix.get_answer_choices_list(doc)
         else:
             raise TypeError
 
