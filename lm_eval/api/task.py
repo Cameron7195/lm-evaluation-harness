@@ -1282,7 +1282,7 @@ class ConfigurableTask(Task):
             return doc_to_choice.get_answer_choices_list(doc)
         else:
             raise TypeError
-        
+
     def doc_to_gen_prefix(self, doc: Any, doc_to_gen_prefix=None) -> List[str]:
         if self.prompt is not None:
             doc_to_gen_prefix = self.prompt

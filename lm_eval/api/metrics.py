@@ -2,10 +2,10 @@ import logging
 import math
 import random
 import re
+import signal
 import string
 from collections.abc import Iterable
 from typing import List
-import signal
 
 import numpy as np
 import sacrebleu
@@ -374,6 +374,7 @@ def acc_all(items):
     acc = np.mean([int(all(x)) for x in question_scoring_dict.values()])
     return acc
 
+
 @register_metric(
     metric="compiles@1",
     higher_is_better=True,
@@ -399,7 +400,7 @@ def compiles_at_1_metric(predictions, references=None, **kwargs):
 
             # Try to compile the combined code snippet with assert statements
             compile(code_with_asserts, "<string>", "exec")
-            
+
             # If compilation is successful, increment the success count
             success_count += 1
 
@@ -409,6 +410,7 @@ def compiles_at_1_metric(predictions, references=None, **kwargs):
             continue
 
     return {"compiles@1": success_count / len(predictions)}
+
 
 @register_metric(
     metric="pass@1",
@@ -423,7 +425,7 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
     """
 
     timeout = kwargs.get("timeout", 5.0)
-    
+
     def handler(signum, frame):
         raise TimeoutError("Execution timed out")
 
@@ -431,10 +433,12 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
 
     for pred, ref in zip(predictions, references):
         try:
-            #import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             # Extract the code snippet from the prediction
             if pred[0:3] == "```":
-                code_snippet = pred.strip().split("```python")[1].split("```")[0].strip()
+                code_snippet = (
+                    pred.strip().split("```python")[1].split("```")[0].strip()
+                )
             else:
                 code_snippet = pred.split("```")[0].strip()
 
@@ -446,7 +450,9 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
             signal.alarm(int(timeout))
 
             try:
-                code_snippet_and_asserts = code_snippet + "\n" + "\n".join(assert_statements)
+                code_snippet_and_asserts = (
+                    code_snippet + "\n" + "\n".join(assert_statements)
+                )
 
                 exec_globals = {}
 
@@ -467,6 +473,8 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
             continue
 
     return {"pass@1": success_count / len(predictions)}
+
+
 # @register_metric(
 #     metric="exec_metric",
 #     higher_is_better=True,
@@ -519,6 +527,7 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
 #             eval_logger.error(f"Execution failed, error: {e}")
 #             continue
 #     return {"exec_metric": success_count / len(predictions)}
+
 
 def acc_all_stderr(items):
     # Only count as correct if all answers are labeled correctly for each question
