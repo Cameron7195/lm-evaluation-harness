@@ -1,5 +1,5 @@
 dataset_path: tau/commonsense_qa
-task: csqa_cot_llama
+task: commonsense_qa_cot_llama
 
 doc_to_target: "{{answerKey if answerKey is defined else target}}"
 doc_to_text: !function csqa_cot_llama_doc_to_text.doc_to_text
