@@ -433,7 +433,6 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
 
     for pred, ref in zip(predictions, references):
         try:
-            # import pdb; pdb.set_trace()
             # Extract the code snippet from the prediction
             if pred[0:3] == "```":
                 code_snippet = (
