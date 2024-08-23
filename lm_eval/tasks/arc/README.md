@@ -43,6 +43,8 @@ None.
 
 * `arc_easy`
 * `arc_challenge`
+* `arc_easy_cot_llama`
+* `arc_challenge_cot_llama`
 
 ### Checklist
 

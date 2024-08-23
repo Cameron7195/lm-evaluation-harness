@@ -45,6 +45,7 @@ Homepage: https://www.tau-nlp.org/commonsenseqa
 #### Tasks
 
 * `commonsense_qa`: Represents the "random" split from the paper. Uses an MMLU-style prompt, as (presumably) used by Llama evaluations.
+* `csqa_cot_llama`: Cot-style prompt from official Chain-of-Thought paper.
 
 ### Checklist
 

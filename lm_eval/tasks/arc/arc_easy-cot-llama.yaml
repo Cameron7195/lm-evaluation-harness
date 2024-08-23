@@ -16,7 +16,7 @@ fewshot_config:
     - question: Which change in the state of water particles causes the particles to become arranged in a fixed position?
       choices: {'text': ['boiling', 'melting', 'freezing', 'evaporating'], 'label': ['A', 'B', 'C', 'D']}
       target: When water is frozen, the particles are arranged in a fixed position; the particles are still moving for all other options. The final answer is C.
-    - question: When a switch is used in an electrical circuit, the switch can 
+    - question: When a switch is used in an electrical circuit, the switch can
       choices: {'text': ['cause the charge to build', 'increase and decrease the voltage', 'cause the current to change direction', 'stop and start the flow of current'], 'label': ['A', 'B', 'C', 'D']}
       target: The function of a switch is to start and stop the flow of a current. The final answer is D.
 filter_list:
