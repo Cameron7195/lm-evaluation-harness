@@ -1,0 +1,65 @@
+dataset_path: allenai/ai2_arc
+dataset_name: ARC-Easy
+task: arc_easy_cot_llama
+
+doc_to_target: "{{answerKey if answerKey is defined else target}}"
+doc_to_text: !function arc_east_cot_doc_to_text.doc_to_text
+fewshot_config:
+  sampler: first_n
+  samples:
+    - question: George wants to warm his hands quickly by rubbing them. Which skin surface will produce the most heat?
+      choices: {'text': ['dry palms', 'wet palms', 'palms covered with oil', 'palms covered with lotion'], 'label': ['A', 'B', 'C', 'D']}
+      target: Dry surfaces will more likely cause more friction via rubbing than other smoother surfaces, hence dry palms will produce the most heat. The final answer is A.
+    - question: Which factor will most likely cause a person to develop a fever?
+      choices: {'text': ['a leg muscle relaxing after exercise', 'a bacterial population in the bloodstream', 'several viral particles on the skin', 'carbohydrates being digested in the stomach'], 'label': ['A', 'B', 'C', 'D']}
+      target: Option B, bacterial population is the most likely cause for a person developing fever. The final answer is B.
+    - question: Which change in the state of water particles causes the particles to become arranged in a fixed position?
+      choices: {'text': ['boiling', 'melting', 'freezing', 'evaporating'], 'label': ['A', 'B', 'C', 'D']}
+      target: When water is frozen, the particles are arranged in a fixed position; the particles are still moving for all other options. The final answer is C.
+    - question: When a switch is used in an electrical circuit, the switch can
+      choices: {'text': ['cause the charge to build', 'increase and decrease the voltage', 'cause the current to change direction', 'stop and start the flow of current'], 'label': ['A', 'B', 'C', 'D']}
+      target: The function of a switch is to start and stop the flow of a current. The final answer is D.
+filter_list:
+- filter:
+  - function: regex
+    group_select: -1
+    regex_pattern: The final answer is ([a-zA-Z1-9])
+  - function: take_first
+  name: strict-match
+- filter:
+  - function: regex
+    group_select: -1
+    regex_pattern: ([a-zA-Z1-9])
+  - function: take_first
+  name: flexible-extract
+generation_kwargs:
+  do_sample: false
+  until:
+  - '<|eot_id|>'
+  - '<|start_header_id|>user<|end_header_id|>'
+  - 'Q:'
+  - </s>
+  - <|im_end|>
+tag:
+- chain_of_thought
+metadata:
+  version: 1.0
+metric_list:
+- aggregation: mean
+  higher_is_better: true
+  ignore_case: true
+  ignore_punctuation: false
+  metric: exact_match
+  regexes_to_ignore:
+  - ','
+  - \$
+  - '(?s).*#### '
+  - \.$
+num_fewshot: 4
+output_type: generate_until
+repeats: 1
+training_split: train
+validation_split: validation
+test_split: test
+should_decontaminate: true
+doc_to_decontamination_query: "Question: {{question}}\nAnswer:"

@@ -474,60 +474,6 @@ def pass_at_1_metric(predictions, references=None, **kwargs):
     return {"pass@1": success_count / len(predictions)}
 
 
-# @register_metric(
-#     metric="exec_metric",
-#     higher_is_better=True,
-#     output_type="generate_until",
-#     aggregation="mean",
-# )
-# def exec_metric(predictions, references=None, **kwargs):
-#     """
-#     Executes the Python code provided in the `predictions` and checks whether it passes all test cases.
-#     Returns the ratio of successful executions to the total number of items.
-#     """
-
-#     timeout = kwargs.get("timeout", 5.0)
-#     def handler(signum, frame):
-#         raise TimeoutError("Execution timed out")
-
-#     success_count = 0
-
-#     for pred, ref in zip(predictions, references):
-#         try:
-#             # Extract the code snippet from the prediction
-#             code_snippet = pred.strip().split("```python")[1].split("```")[0].strip()
-
-#             # Extract the assert statements from the references
-#             assert_statements = ref.strip().split("\n")
-
-#             # Set the timeout handler
-#             signal.signal(signal.SIGALRM, handler)
-#             signal.alarm(int(timeout))
-
-#             try:
-#                 # Execute the generated code
-#                 exec(code_snippet)
-
-#                 # Run through each assertion in the references
-#                 for assertion in assert_statements:
-#                     exec(assertion)
-
-#                 # If no exception is raised, consider it a success
-#                 success_count += 1
-
-#             except TimeoutError as e:
-#                 eval_logger.error(f"Execution timed out: {e}")
-#             finally:
-#                 signal.alarm(0)  # Disable the alarm
-
-#         except Exception as e:
-#             # Log the error and continue
-#             #print(e)
-#             eval_logger.error(f"Execution failed, error: {e}")
-#             continue
-#     return {"exec_metric": success_count / len(predictions)}
-
-
 def acc_all_stderr(items):
     # Only count as correct if all answers are labeled correctly for each question
     question_scoring_dict = {}
